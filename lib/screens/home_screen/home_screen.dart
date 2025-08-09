@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:qurani_app/screens/home_screen/widgets/home_screen_item.dart';
-import 'package:qurani_app/screens/my_saving_screen/my_saving_screen.dart';
+import 'package:qurani_app/screens/quran_collection_screen/quran_collection_screen.dart';
 import 'package:qurani_app/screens/quran_screen/quran_screen.dart';
 import 'package:qurani_app/shared/constants/asset_const.dart';
 
@@ -43,12 +44,7 @@ class HomeScreen extends StatelessWidget {
               height: Get.height * 0.15,
               text: 'القران الكريم',
               imagePath: AssetConst.quranBookImagePath,
-              onTap: () => Get.to(
-                () => QuranScreen(),
-                curve: Curves.easeInOut,
-                duration: Duration(milliseconds: 200),
-                transition: Transition.leftToRight,
-              ),
+              onTap: () => Get.to(() => QuranScreen()),
             ),
             SizedBox(height: 20),
             GridView(
@@ -67,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                 HomeScreenItem(
                   text: 'حفظي',
                   imagePath: AssetConst.myQuranSavingsImagePath,
-                  onTap: () => Get.to(() => MySavingScreen()),
+                  onTap: () => Get.to(() => QuranCollectionsScreen()),
                 ),
                 HomeScreenItem(
                   text: 'دعــاء',

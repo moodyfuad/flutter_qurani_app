@@ -90,14 +90,14 @@ class _PageMenuButtonState extends State<PageMenuButton>
                 child: Column(
                   children:
                       [
-                        buildMenuItem(
-                          'اضافة لقائمتي',
-                          Icons.add_box_outlined,
+                        QuranPageMenuItemWidget(
+                          text: 'اضافة لقائمتي',
+                          icon: Icons.add_box_outlined,
                           onPress: () {},
                         ),
-                        buildMenuItem(
-                          'ضع علامة',
-                          Icons.bookmark_border_outlined,
+                        QuranPageMenuItemWidget(
+                          text: 'ضع علامة',
+                          icon: Icons.bookmark_border_outlined,
                           onPress: () {},
                         ),
                       ].animate(
@@ -113,8 +113,22 @@ class _PageMenuButtonState extends State<PageMenuButton>
       ],
     );
   }
+}
 
-  Widget buildMenuItem(String text, IconData icon, {VoidCallback? onPress}) {
+class QuranPageMenuItemWidget extends StatelessWidget {
+  const QuranPageMenuItemWidget({
+    super.key,
+    required this.text,
+    required this.icon,
+    required this.onPress,
+  });
+
+  final String text;
+  final IconData icon;
+  final VoidCallback? onPress;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       child: MaterialButton(

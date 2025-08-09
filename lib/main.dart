@@ -18,6 +18,8 @@ class MyApp extends StatelessWidget {
       bottom: true,
       top: false,
       child: GetMaterialApp(
+        defaultTransition: Transition.cupertino,
+        
         title: 'Flutter Demo',
         locale: Locale('ar', 'sa'),
 

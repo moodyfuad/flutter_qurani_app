@@ -24,17 +24,8 @@ class _QuranScreenState extends State<QuranScreen> {
   List<SearchResult> searchResults = [];
   OverlayEntry? _overlayEntry;
   bool _showOverLay = false;
-  TextEditingController searchController = TextEditingController();
-  PageController pageController = PageController(initialPage: 1);
-
-  static String getPageNumber(int pageNumber) {
-    if (pageNumber > 0 && pageNumber < 10) return '00$pageNumber';
-    if (pageNumber < 100) {
-      return '0$pageNumber';
-    } else {
-      return '$pageNumber';
-    }
-  }
+  late final TextEditingController searchController;
+  late final PageController pageController;
 
   search(String string) {
     if (string.isEmpty) {
@@ -122,7 +113,8 @@ class _QuranScreenState extends State<QuranScreen> {
 
   @override
   void initState() {
-    // selectedPage = QuranPageModel.formPageNumber(pageController.initialPage);
+    searchController = TextEditingController();
+    pageController = PageController(initialPage: 0);
     super.initState();
   }
 
@@ -211,93 +203,100 @@ class _QuranScreenState extends State<QuranScreen> {
       ),
       body: PageView.builder(
         physics: PageScrollPhysics(),
-        itemCount: pages.length,
+        itemCount: 604,
+        padEnds: true,
         scrollBehavior: MaterialScrollBehavior(),
 
         controller: pageController,
         itemBuilder: (context, index) {
-          return pages[index];
+          // return pages[index];
+          return buildPageWidget(index + 1);
         },
         scrollDirection: Axis.horizontal,
       ),
     );
   }
 
-  List<Widget> pages = List.generate(604, (index) {
-    int pageNumber = index + 1;
-    return FutureBuilder(
-      future: QuranPageModel.formPageNumber(pageNumber),
+  static Widget? buildPageWidget(int pageNumber) {
+    return pageNumber > 604
+        ? throw IndexError.withLength(pageNumber, 604)
+        : pageNumber < 1
+        ? throw IndexError.withLength(pageNumber, 604)
+        : FutureBuilder(
+            future: QuranPageModel.formPageNumber(pageNumber),
 
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data!.surahs.first.number == 1) {
-            return SurahAlfatihaWidget(snapshot.data!.surahs.first);
-          } else {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  // mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    HeaderCornerWidget(
-                      text: 'الجزء ${snapshot.data!.juzuNumber}',
-                      width: 150,
-                    ),
-                    HeaderCornerWidget(
-                      text: snapshot.data!.surahs.first.name.arabic,
-                      width: 150,
-                    ),
-                  ],
-                ),
-                ...snapshot.data!.surahs.map((surah) {
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data!.surahs.first.number == 1) {
+                  return SurahAlfatihaWidget(snapshot.data!.surahs.first);
+                } else {
                   return Column(
-                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (surah.startVerse == 1)
-                        SurahHeadingWidget(surah: surah, fontSize: 25.sp),
-                      if (surah.startVerse == 1 && pageNumber != 187)
-                        BesmallahWidget(
-                          fontSize: PageHelpers.getFontSize(pageNumber),
-                        ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text(
-                          surah.versesAsString,
-                          softWrap: true,
-                          textDirection: TextDirection.rtl,
-                          textAlign: PageHelpers.isCenter(pageNumber)
-                              ? TextAlign.center
-                              : TextAlign.right,
-                          style: TextStyle(
-                            fontSize: PageHelpers.getFontSize(pageNumber),
-
-                            color: Colors.black,
-                            fontFamily:
-                                'QCF_P${getPageNumber(snapshot.data!.pageNumber)}',
-                            height: 1.3.h,
-                            wordSpacing: 0,
-                            letterSpacing: 0.w,
+                      Row(
+                        // mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          HeaderCornerWidget(
+                            text: 'الجزء ${snapshot.data!.juzuNumber}',
+                            width: 150,
                           ),
-                        ),
+                          HeaderCornerWidget(
+                            text: snapshot.data!.surahs.first.name.arabic,
+                            width: 150,
+                          ),
+                        ],
                       ),
+                      ...snapshot.data!.surahs.map((surah) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (surah.startVerse == 1)
+                              SurahHeadingWidget(surah: surah, fontSize: 25.sp),
+                            if (surah.startVerse == 1 && pageNumber != 187)
+                              BesmallahWidget(
+                                fontSize: PageHelpers.getFontSize(pageNumber),
+                              ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15.0,
+                              ),
+                              child: Text(
+                                surah.versesAsString,
+                                softWrap: true,
+                                textDirection: TextDirection.rtl,
+                                textAlign: PageHelpers.isCenter(pageNumber)
+                                    ? TextAlign.center
+                                    : TextAlign.right,
+                                style: TextStyle(
+                                  fontSize: PageHelpers.getFontSize(pageNumber),
+
+                                  color: Colors.black,
+                                  fontFamily:
+                                      'QCF_P${snapshot.data!.pageNumber.toString().padLeft(3, '0')}',
+                                  height: 1.3.h,
+                                  wordSpacing: 0,
+                                  letterSpacing: 0.w,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                      Spacer(flex: 1),
+                      PageNumberWidget(snapshot.data!.pageNumber),
                     ],
                   );
-                }),
-                Spacer(flex: 1),
-                PageNumberWidget(snapshot.data!.pageNumber),
-              ],
-            );
-          }
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error occur'));
-        } else {
-          return CircularProgressIndicator.adaptive();
-        }
-      },
-    );
-  });
+                }
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error occur'));
+              } else {
+                return CircularProgressIndicator.adaptive();
+              }
+            },
+          );
+  }
 }
